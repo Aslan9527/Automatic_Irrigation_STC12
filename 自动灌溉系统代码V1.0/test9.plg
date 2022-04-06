@@ -1,0 +1,21 @@
+<html>
+<body>
+<pre>
+<h1>礦ision3 Build Log</h1>
+<h2>Project:</h2>
+H:\Blue_Sky_C51 资料\Blue_Sky_C51 配套例程\实验9 内置AD\test9.uv2
+Project File Date:  03/14/2012
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_WRITE_NUM?MAIN
+Program Size: data=18.0 xdata=0 code=1700
+creating hex file from "test9"...
+"test9" - 0 Error(s), 1 Warning(s).
+</pre>
+</body>
+</html>
