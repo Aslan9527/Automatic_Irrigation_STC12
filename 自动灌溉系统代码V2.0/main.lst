@@ -1,0 +1,158 @@
+C51 COMPILER V9.53.0.0   MAIN                                                              07/15/2020 19:57:12 PAGE 1   
+
+
+C51 COMPILER V9.53.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Output\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE User\main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Header) DEBUG OBJECTEXTEND
+                    - PRINT(.\main.lst) TABS(2) OBJECT(.\Output\main.obj)
+
+line level    source
+
+   1          #include <STC12C5A60S2.h>
+   2          #include <LCD1602.h>
+   3          #include <ADC.h>
+   4          #include <usart.h>
+   5          #include <string.h>
+   6          #include <intrins.h>
+   7          #define uchar unsigned  char
+   8          #define uint  unsigned  int
+   9          #define FSCLK 11059200
+  10          
+  11          sbit moto=P1^1;
+  12          float res0,res1;
+  13          uchar a,b,c;
+  14          uchar i;
+  15          uchar data_buffer[20],data_length = 0,flag = 0;
+  16          uchar table0[8]="SetValue";
+  17          uchar table1[]={'S','e','t','V','a','l','u','e',':','x','.','x','x','O','K','.'};
+  18          uchar table2[5]="Start";
+  19          uchar table3[10]="Operating.";
+  20          uchar table4[4]="Stop";
+  21          uchar table5[7]="Stoped.";
+  22          uchar table6[]={'S','e','t','V','a','l','u','e',':',' ','x','x','x','.'};
+  23          
+  24          
+  25          void Delay_ms(uint time)
+  26          {
+  27   1        uint i,j;
+  28   1        for(i = 0;i < time;i ++)
+  29   1          for(j = 0;j < 930;j ++);
+  30   1      }
+  31          
+  32          void Display_Now_U()
+  33          {
+  34   1          Write_1602_String("NOW:U=",0x80);
+  35   1          Write_1602_Data(0x30 + (uint)res0%10);
+  36   1          Write_1602_Data('.');
+  37   1          Write_1602_Data(0x30 + (uint)(res0*10)%10);
+  38   1          Write_1602_Data(0x30 + (uint)(res0*100)%10);
+  39   1          Write_1602_Data('V');
+  40   1      }
+  41          
+  42          void Display_Set_U()
+  43          {
+  44   1          Write_1602_String("SET:U=",0x80+0x40);
+  45   1          Write_1602_Data(0x30 + (uint)res1%10);
+  46   1          Write_1602_Data('.');
+  47   1          Write_1602_Data(0x30 + (uint)(res1*10)%10);
+  48   1          Write_1602_Data(0x30 + (uint)(res1*100)%10);
+  49   1          Write_1602_Data('V');
+  50   1      }
+  51          
+  52          
+  53          int Analysis(char *S,char *D,char LEN)    
+  54          {
+C51 COMPILER V9.53.0.0   MAIN                                                              07/15/2020 19:57:12 PAGE 2   
+
+  55   1      int n;
+  56   1      for(n=0;n<LEN;n++)
+  57   1      if(S[n]!=D[n]) return 1;
+  58   1      return 0;
+  59   1      }
+  60          
+  61          void main()
+  62          {
+  63   1      
+  64   1        LCD_1602_Init(); 
+  65   1        ADC_Init(ADC_PORT0); 
+  66   1        USART_Init();
+  67   1        moto=1;
+  68   1        res1=1.28;
+  69   1      
+  70   1        while(1)
+  71   1        {
+  72   2          res0=GetADCResult(ADC_CH0); 
+  73   2          Display_Now_U();
+  74   2          Display_Set_U();
+  75   2          if(flag==1)
+  76   2          {
+  77   3            flag=0;
+  78   3            
+  79   3            a=Analysis(data_buffer,table0,8) ;
+  80   3            b=Analysis(data_buffer,table2,5) ;
+  81   3            c=Analysis(data_buffer,table4,4) ;
+  82   3              if(a==0)
+  83   3            {
+  84   4              if(data_buffer[10]!=NULL)
+  85   4              {
+  86   5                table1[9]=data_buffer[9];
+  87   5                table1[10]=data_buffer[10];
+  88   5                table1[11]=data_buffer[11];
+  89   5                table1[12]=data_buffer[12];
+  90   5                Send_String(table1,16);   
+  91   5                res1=(data_buffer[9]-48)*100+(data_buffer[11]-48)*10+(data_buffer[12]-48);  
+  92   5                res1 = res1/100;
+  93   5              }
+  94   4              else
+  95   4              {
+  96   5                table1[9]='x';
+  97   5                 table1[10]='.';
+  98   5                 table1[11]='x';
+  99   5                 table1[12]='x';
+ 100   5                Send_String(table6,14);
+ 101   5                res1 = 0;
+ 102   5              }         
+ 103   4              a=1;
+ 104   4              
+ 105   4            }
+ 106   3              if(b==0)
+ 107   3            {
+ 108   4              Send_String(table3,10);
+ 109   4              moto=0;        
+ 110   4              b=1;        
+ 111   4            
+ 112   4            }
+ 113   3              if(c==0)
+ 114   3            {
+ 115   4               Send_String(table5,7);
+ 116   4              moto=1;
+C51 COMPILER V9.53.0.0   MAIN                                                              07/15/2020 19:57:12 PAGE 3   
+
+ 117   4              c=1;              
+ 118   4            }
+ 119   3      
+ 120   3              for(i=0;i<20;i++)
+ 121   3            {
+ 122   4              data_buffer[i]=NULL;
+*** WARNING C260 IN LINE 122 OF User\main.c: '=': pointer truncation
+ 123   4            }
+ 124   3           
+ 125   3          }
+ 126   2            
+ 127   2          Delay_ms(10);
+ 128   2        } 
+ 129   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1001    ----
+   CONSTANT SIZE    =     78    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     99      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

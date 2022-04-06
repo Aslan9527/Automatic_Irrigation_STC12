@@ -1,0 +1,4 @@
+".\Output\STARTUP.obj",
+".\Output\main.obj" 
+TO ".\Output\3839" 
+PRINT(".\3839.m51") RAMSIZE(256) 
